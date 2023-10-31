@@ -19,11 +19,13 @@ def greedysymmetric(n,start_conf):
 
     #function to print information
     def printdata():
-        print('available blocks:')
-        for i in range(m):
-            print(blocks[i])
-        for i in range(m):
-            print(blocks[-i-1])
+##        print('available blocks:')
+##        for i in range(m):
+##            print(blocks[i])
+##        for i in range(m):
+##            print(blocks[-i-1])
+        print('starting configuration:')
+        print(start_conf)
         print('solution:')
         for i in range(2*m):
             print(solution[i])
@@ -47,7 +49,7 @@ def greedysymmetric(n,start_conf):
         row_sum[-i-1] = s
         sol_sum[-i-1].append(s)
 
-    printdata()
+    #printdata()
 
     #main loop
     for slot in range(1,total):
@@ -77,10 +79,10 @@ def greedysymmetric(n,start_conf):
             
             #check if we need a block bigger than the biggest block
             if cand_block>n:
-                print('row needs too big of a block. row:',cand_row)
+                #print('row needs too big of a block. row:',cand_row)
                 break
             if cand_block<0:
-                print('could not cover slot:',slot)
+                #print('could not cover slot:',slot)
                 break
             
             #if it is possible to add block, add it
@@ -105,19 +107,74 @@ def greedysymmetric(n,start_conf):
             #print('block rejected') #flag
         #check if slot was not filled
         if ended==0:
-            print('slot not covered / problem. slot:', slot)
-            printdata()
-            for i in range(2*m):
-               print('row:',i,'block needed:',slot - row_sum[i])
-            print('from the other side:')
-            for i in range(2*m):
-               print('row:',i,'block needed:',total - row_sum[-i-1]-slot)
+##            print('slot not covered / problem. slot:', slot)
+##            printdata()
+##            for i in range(2*m):
+##               print('row:',i,'block needed:',slot - row_sum[i])
+##            print('from the other side:')
+##            for i in range(2*m):
+##               print('row:',i,'block needed:',total - row_sum[-i-1]-slot)
             break
 
     #check solution
     if ended:
+        print('─' * 10)
+        print('\n')
         print('solution found')
         printdata()
 
+    return ended
 
-greedysymmetric(10,[1, 2, 4, 5, 7, 8])
+#end of function
+
+
+#function creating all possible combinations
+def n_length_combo(lst, n):
+     
+    if n == 0:
+        return [[]]
+     
+    l =[]
+    for i in range(0, len(lst)):
+         
+        m = lst[i]
+        remLst = lst[i + 1:]
+         
+        remainlst_combo = n_length_combo(remLst, n-1)
+        for p in remainlst_combo:
+             l.append([m, *p])
+           
+    return l
+
+#search loop for starting configurations
+while True:
+    try:
+        n = int(input("Please enter the maximum size of blocks (n): "))
+    except ValueError:
+        print("Sorry, I didn't understand that.")
+        continue
+
+    if n < 0:
+        print("Sorry, your response must not be negative.")
+        continue
+    elif n%4 != 2:
+        print('Your answer needs to be congruent to 2 mod 4 for the algorithm to run')
+    else:
+        #n is a valid size
+        break
+
+l = int(n/2)
+
+available_blocks = [x for x in range(2,n+1)]
+num_of_sol=0
+
+combinations = n_length_combo(available_blocks,l)
+for lst in combinations:
+    start_conf=[1]
+    start_conf.extend(lst)
+    num_of_sol += greedysymmetric(n,start_conf)
+
+print('─' * 10)
+print('\n')
+print('Number of solutions found: ',num_of_sol)
+#greedysymmetric(10,[1, 2, 4, 5, 7, 8])
