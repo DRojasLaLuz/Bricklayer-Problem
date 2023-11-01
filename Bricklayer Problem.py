@@ -1,3 +1,6 @@
+#import numpy
+import math
+
 def greedysymmetric(n,start_conf):
     
     m = int((int(n/2)+1)/2)
@@ -26,12 +29,13 @@ def greedysymmetric(n,start_conf):
 ##            print(blocks[-i-1])
         print('starting configuration:')
         print(start_conf)
-        print('solution:')
-        for i in range(2*m):
-            print(solution[i])
-        print('solution sum:')
-        for i in range(2*m):
-            print(sol_sum[i])
+        print('sum',sum(start_conf))
+##        print('solution:')
+##        for i in range(2*m):
+##            print(solution[i])
+##        print('solution sum:')
+##        for i in range(2*m):
+##            print(sol_sum[i])
         #print('row_sum:',row_sum)
 
     #Set up starting configuration
@@ -118,10 +122,11 @@ def greedysymmetric(n,start_conf):
 
     #check solution
     if ended:
-        print('─' * 10)
-        print('\n')
-        print('solution found')
+##        print('─' * 10)
+##        print('\n')
+##        print('solution found')
         printdata()
+        
 
     return ended
 
@@ -129,22 +134,183 @@ def greedysymmetric(n,start_conf):
 
 
 #function creating all possible combinations
-def n_length_combo(lst, n):
+##def n_length_combo(lst, n):
+##     
+##    if n == 0:
+##        return [[]]
+##     
+##    l =[]
+##    for i in range(0, len(lst)):
+##         
+##        m = lst[i]
+##        remLst = lst[i + 1:]
+##         
+##        remainlst_combo = n_length_combo(remLst, n-1)
+##        for p in remainlst_combo:
+##             l.append([m, *p])
+##           
+##    return l
+
+def n_length_combo(iterable, r, n):
      
-    if n == 0:
-        return [[]]
+    char = tuple(iterable)
+    n = len(char)
      
-    l =[]
-    for i in range(0, len(lst)):
+    if r > n:
+        return
+     
+    index = [i for i in range(r)]
+     
+    # returns the first sequence 
+    yield tuple(char[i] for i in index)
+     
+    while True:
          
-        m = lst[i]
-        remLst = lst[i + 1:]
+        for i in reversed(range(r)):
+            if index[i] != i + n - r:
+                break
+        else:
+            return
          
-        remainlst_combo = n_length_combo(remLst, n-1)
-        for p in remainlst_combo:
-             l.append([m, *p])
-           
-    return l
+        index[i] += 1
+         
+        for j in range(i + 1, r):
+             
+            index[j] = index[j-1] + 1
+            
+        s = sum([char[i] for i in index])
+
+        if s == math.floor(n*(n+1)/4):
+            yield tuple(char[i] for i in index)
+
+
+def iter_greedysym(n,all_sol):
+    l = int(n/2)
+
+    available_blocks = [x for x in range(3,n+1)]
+    num_of_sol=0
+    sum_conf = 0
+
+    combinations = list(n_length_combo(available_blocks,l-1, n))
+    
+    print('combinations:',len(combinations))
+    for lst in combinations:
+        start_conf=[1, 2]
+        start_conf.extend(lst)
+        solved = greedysymmetric(n,start_conf)
+        num_of_sol += solved
+        #if solved:
+        #    sum_conf += sum(start_conf)
+        if (all_sol == 0) and (num_of_sol == 1):
+            #print('solution found')
+            break
+    print('─' * 10)
+    print('\n')
+    print('Number of solutions found: ',num_of_sol)
+    #print('Average sum of start_conf: ',sum_conf/num_of_sol)
+    
+def by_iter_greedy_rev(n):
+    r = 6
+
+    available_blocks = [x for x in range(int(n/2)+2-r,n+1)]
+    #print(available_blocks)
+    num_of_sol=0
+    sum_conf = 0
+
+    iterable = available_blocks
+    
+    
+    char = tuple(reversed(iterable))
+    l = len(char)
+     
+    if r > l:
+        return
+     
+    index = [i for i in range(r)]
+    #print(index)
+     
+    # returns the first sequence 
+   # yield tuple(char[i] for i in index)
+     
+    while True:
+        
+        sum_conf = sum([char[i] for i in index])
+        solved = 0
+
+        #if abs(sum_conf - (n*(n+1)/4))<=5:
+        start_conf=[i+1 for i in range(int(n/2)+1-r)]
+        start_conf.extend([char[i] for i in reversed(index)])
+        #print(index)
+        #print(start_conf)
+        solved = greedysymmetric(n,start_conf)
+        if solved == 1:
+            print('solved')
+            return
+         
+        for i in reversed(range(r)):
+            if index[i] != i + l - r:
+                break
+        else:
+            return
+         
+        index[i] += 1
+         
+        for j in range(i + 1, r):
+             
+            index[j] = index[j-1] + 1
+            
+        
+        
+def by_iter_greedy(n):
+    r = int(n/2) - 1
+
+    available_blocks = [x for x in range(3,n+1)]
+    num_of_sol=0
+    sum_conf = 0
+
+    iterable = available_blocks
+    
+    
+    char = tuple(iterable)
+    l = len(char)
+     
+    if r > l:
+        return
+     
+    index = [i for i in range(r)]
+     
+    # returns the first sequence 
+    # yield tuple(char[i] for i in index)
+     
+    while True:
+         
+        for i in reversed(range(r)):
+            if index[i] != i + l - r:
+                break
+        else:
+            return
+         
+        index[i] += 1
+         
+        for j in range(i + 1, r):
+             
+            index[j] = index[j-1] + 1
+            
+        sum_conf = sum([char[i] for i in index])
+        solved = 0
+
+        #if abs(sum_conf - (n*(n+1)/4))<=5:
+        start_conf=[1, 2]
+        start_conf.extend([char[i] for i in index])
+        #print(start_conf)
+        solved = greedysymmetric(n,start_conf)
+        if solved == 1:
+            print('solved')
+            return
+        
+        
+        
+       
 
 #search loop for starting configurations
 while True:
@@ -163,18 +329,15 @@ while True:
         #n is a valid size
         break
 
-l = int(n/2)
+##while True:
+##    try:
+##        all_sol = int(input("Do you want all solutions (enter 1 if yes, 0 if you want only one solution): "))
+##    except ValueError:
+##        print("Sorry, I didn't understand that.")
+##        continue
+##    break
 
-available_blocks = [x for x in range(2,n+1)]
-num_of_sol=0
+#by_iter_greedy_rev(n)
+by_iter_greedy(n)
 
-combinations = n_length_combo(available_blocks,l)
-for lst in combinations:
-    start_conf=[1]
-    start_conf.extend(lst)
-    num_of_sol += greedysymmetric(n,start_conf)
-
-print('─' * 10)
-print('\n')
-print('Number of solutions found: ',num_of_sol)
 #greedysymmetric(10,[1, 2, 4, 5, 7, 8])

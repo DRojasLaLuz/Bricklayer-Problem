@@ -1,4 +1,4 @@
-import numpy
+#import numpy
 import math
 
 def greedysymmetric(n,start_conf):
@@ -159,7 +159,7 @@ def n_length_combo(iterable, r, n):
     if r > n:
         return
      
-    index = numpy.arange(r)
+    index = [i for i in range(r)]
      
     # returns the first sequence 
     yield tuple(char[i] for i in index)
@@ -226,7 +226,7 @@ def by_iter_greedy_rev(n):
     if r > l:
         return
      
-    index = numpy.arange(r)
+    index = [i for i in range(r)]
     #print(index)
      
     # returns the first sequence 
@@ -277,7 +277,7 @@ def by_iter_greedy(n):
     if r > l:
         return
      
-    index = numpy.arange(r)
+    index = [i for i in range(r)]
      
     # returns the first sequence 
     # yield tuple(char[i] for i in index)
